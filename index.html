@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <title>Quick AR Experience</title>
+        <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+        <style>
+            html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; } 
+            #loader { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 999; font-family: sans-serif; }
+            /* Critical CSS to allow clicks to pass through to the 3D canvas */
+            .mindar-ui-overlay, .mindar-ui-scanning { pointer-events: none !important; }
+            video { pointer-events: none !important; }
+            .a-canvas { pointer-events: auto !important; touch-action: none !important; }
+        </style>
+        
+            <script>
+                AFRAME.registerComponent('tap-handler', {
+                    init: function () {
+                        const executeTap = (e) => {
+                            if (this.isFiring) return;
+                            this.isFiring = true;
+                            setTimeout(() => { this.isFiring = false; }, 300);
+                            
+                    const srcId = this.el.getAttribute('src');
+                    if (srcId) {
+                        const videoEl = document.querySelector(srcId);
+                        if (videoEl && videoEl.tagName === 'VIDEO') {
+                            if (videoEl.paused) { videoEl.play(); } else { videoEl.pause(); }
+                        }
+                    }
+                
+                        };
+                        this.el.addEventListener('mousedown', executeTap);
+                    }
+                });
+            </script>
+            
+    </head>
+    <body>
+        <div id="loader">Loading AR Experience...</div>
+        <button id="export-unmute-btn" style="position: absolute; bottom: 20px; right: 20px; z-index: 9999; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(4px);"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg></button>
+        <a-scene mindar-image="imageTargetSrc: ./target.mind; uiScanning: no; filterMinCF: 0.001; filterBeta: 0.01;" color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true;" gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+            <a-assets><video id="media-6g26ercez" src="./WhatsApp Video 2026-11-25 at 2.00.09 PM.mp4" autoplay loop muted playsinline></video></a-assets>
+            <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
+            <a-light type="ambient" color="#FFF" intensity="1.5"></a-light>
+            <a-light type="directional" color="#FFF" intensity="1.5" position="0.5 1 1"></a-light>
+            <a-entity mindar-image-target="targetIndex: 0"><a-video src="#media-6g26ercez" position="0 0 0" scale="1 1 1" height="0.5625" width="1" rotation="0 0 0" class="clickable" tap-handler></a-video></a-entity>
+        </a-scene>
+        <script>
+            document.querySelector('a-scene').addEventListener('arReady', () => { document.getElementById('loader').style.display = 'none'; });
+            document.getElementById('export-unmute-btn').addEventListener('click', function() { var vid = document.getElementById('media-6g26ercez'); if(vid) { vid.muted = !vid.muted; this.innerHTML = vid.muted ? '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>' : '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>'; } });
+        </script>
+    </body>
+</html>
